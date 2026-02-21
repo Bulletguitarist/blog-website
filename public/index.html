@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Modern Blog</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="navbar">
+  <h2>Blogspot</h2>
+  <div>
+    <button onclick="location.href='login.html'">Login</button>
+    <button onclick="location.href='register.html'">Register</button>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-content">
+    <h1>Modern Blog</h1>
+    <p>Insights, inspiration and beautifully crafted ideas powered by full-stack development.</p>
+  </div>
+</div>
+
+<div class="blog-container" id="blogs"></div>
+
+<script>
+
+fetch("/api/blog")
+.then(res => res.json())
+.then(data => {
+  let out = "";
+
+  data.forEach((b, index) => {
+    out += `
+    <div class="blog">
+      <img src="https://source.unsplash.com/600x400/?nature,technology,writing&sig=${index}" />
+      <div class="blog-content">
+        <h3>${b.title}</h3>
+        <p>${b.content}</p>
+        ${
+          localStorage.getItem("token")
+          ? `<button onclick="del('${b._id}')">Delete</button>`
+          : ""
+        }
+      </div>
+    </div>
+    `;
+  });
+
+  document.getElementById("blogs").innerHTML = out;
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add("show");
+      }
+    });
+  });
+
+  document.querySelectorAll(".blog").forEach(el=>{
+    observer.observe(el);
+  });
+
+})
+.catch(err => console.log(err));
+
+function del(id){
+  fetch("/api/blog/" + id, {
+    method: "DELETE",
+    headers: {
+      "Authorization": localStorage.getItem("token")
+    }
+  })
+  .then(() => location.reload())
+  .catch(err => console.log(err));
+}
+
+// Page fade-in
+document.body.style.opacity = 0;
+window.addEventListener("load", ()=>{
+  document.body.style.transition = "opacity 0.6s ease";
+  document.body.style.opacity = 1;
+});
+
+</script>
+
+</body>
+</html>

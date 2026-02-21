@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <h2>Welcome Back</h2>
+    <p>Login to continue to your dashboard</p>
+
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+
+    <button onclick="login()">Login</button>
+
+    <div class="link">
+      Don’t have an account? <a href="register.html">Register</a>
+    </div>
+  </div>
+</div>
+
+<script>
+function login(){
+  fetch("/api/auth/login",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      email: email.value,
+      password: password.value
+    })
+  })
+  .then(res=>res.text())
+  .then(data=>{
+    try{
+      const json = JSON.parse(data);
+      if(json.token){
+        localStorage.setItem("token", json.token);
+        window.location="dashboard.html";
+      }else{
+        alert(data);
+      }
+    }catch{
+      alert(data);
+    }
+  });
+}
+</script>
+
+</body>
+</html>

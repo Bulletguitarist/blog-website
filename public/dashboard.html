@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="navbar">
+  <h2>Dashboard</h2>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<div class="dashboard-container">
+  <div class="form-card">
+    <h2>Create New Blog</h2>
+
+    <input id="title" placeholder="Blog Title">
+    <textarea id="content" rows="6" placeholder="Write your content here..."></textarea>
+
+    <button onclick="createBlog()">Publish</button>
+  </div>
+</div>
+
+<script>
+
+if(!localStorage.getItem("token")){
+  window.location="login.html";
+}
+
+function createBlog(){
+  const title = document.getElementById("title").value.trim();
+  const content = document.getElementById("content").value.trim();
+
+  if(!title || !content){
+    alert("Fill all fields!");
+    return;
+  }
+
+  fetch("/api/blog/create",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "Authorization":localStorage.getItem("token")
+    },
+    body:JSON.stringify({title,content})
+  })
+  .then(()=>alert("Blog Published 🚀"));
+}
+
+function logout(){
+  localStorage.removeItem("token");
+  window.location="login.html";
+}
+
+</script>
+
+</body>
+</html>
